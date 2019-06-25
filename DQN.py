@@ -38,18 +38,9 @@ with tf.variable_scope('q_next'):   # target network, not to train
 
 q_target = tf_r + GAMMA * tf.reduce_max(q_next, axis=1)                   # shape=(None, ),
 
-
-
-
-
 # a_indices  ('Ep: ', 205, '| Ep_r: ', 1.25)
 a_indices = tf.stack([tf.range(tf.shape(tf_a)[0], dtype=tf.int32), tf_a], axis=1)
 q_wrt_a = tf.gather_nd(params=q, indices=a_indices)     # shape=(None, ), q for current state
-
-
-
-
-
 
 # the q_value of a state should be the value, this value are consist of two parts,
 # one is the reward get from the env from the current state and the token action,
