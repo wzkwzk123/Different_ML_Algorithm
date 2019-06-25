@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import gym
 
+
 tf.set_random_seed(1)
 np.random.seed(1)
 
@@ -11,7 +12,7 @@ LR = 0.01                   # learning rate
 EPSILON = 0.9               # greedy policy
 GAMMA = 0.9                 # reward discount
 TARGET_REPLACE_ITER = 100   # target update frequency
-MEMORY_CAPACITY = 2000
+MEMORY_CAPACITY = 200
 MEMORY_COUNTER = 0          # for store experience
 LEARNING_STEP_COUNTER = 0   # for target updating
 env = gym.make('CartPole-v0')
@@ -38,7 +39,8 @@ with tf.variable_scope('q_next'):   # target network, not to train
 
 q_target = tf_r + GAMMA * tf.reduce_max(q_next, axis=1)                   # shape=(None, ),
 
-# a_indices  ('Ep: ', 205, '| Ep_r: ', 1.25)
+# the output q has the dimension of 32 4, but we only need the q value of the token action.
+# a_indices  action with indices
 a_indices = tf.stack([tf.range(tf.shape(tf_a)[0], dtype=tf.int32), tf_a], axis=1)
 q_wrt_a = tf.gather_nd(params=q, indices=a_indices)     # shape=(None, ), q for current state
 
@@ -76,6 +78,7 @@ def store_transition(s, a, r, s_):
 def learn():
     # update target net
     global LEARNING_STEP_COUNTER
+    # merge the target net using current net
     if LEARNING_STEP_COUNTER % TARGET_REPLACE_ITER == 0:
         t_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='q_next')
         e_params = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope='q')
@@ -87,7 +90,6 @@ def learn():
     sample_index = np.random.choice(MEMORY_CAPACITY, BATCH_SIZE)
 
     b_memory = MEMORY[sample_index, :] # choose BATCH_SIZE examples by the sample_index, sample_indes is list type
-    print(b_memory)
     b_s = b_memory[:, :N_STATES]
     b_a = b_memory[:, N_STATES].astype(int)
     b_r = b_memory[:, N_STATES+1]
