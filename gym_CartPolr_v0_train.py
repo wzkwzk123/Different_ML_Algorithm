@@ -3,6 +3,9 @@ import numpy as np
 import gym
 from DQN1 import DQN
 
+tf.set_random_seed(1)
+np.random.seed(1)
+
 env = gym.make('CartPole-v0')
 env = env.unwrapped
 N_ACTIONS = env.action_space.n
@@ -11,7 +14,6 @@ N_ACTIONS = env.action_space.n
 
 DQN_agent = DQN(N_ACTIONS=N_ACTIONS, N_STATES=N_STATES)
 DQN_agent.creat_net()
-
 for i_episode in range(400):
     s = env.reset() # the shape of s is (4,) , a simple list type
 
@@ -35,7 +37,7 @@ for i_episode in range(400):
 
         ep_r += r
         if DQN_agent.MEMORY_COUNTER > DQN_agent.MEMORY_CAPACITY: # after the momery is filled
-             DQN_agent.learn()
+            DQN_agent.learn()
             if done:
                 print('Ep: ', i_episode,
                       '| Ep_r: ', round(ep_r, 2))
